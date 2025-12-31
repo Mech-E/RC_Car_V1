@@ -6,7 +6,9 @@ time.sleep(2)  # allow Pico to reboot
 
 def send_angle(angle):
     msg = f"Set{angle}\n"
-    ser.write(f"SET {angle}\n".encode())
+def send_angle(angle):
+    msg = f"SET {angle}\n"
+    print(f"[PI] Sending: {msg.strip()}")
     ser.write(msg.encode())
 
 # Test loop
