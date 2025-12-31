@@ -5,9 +5,12 @@ ser = serial.Serial('/dev/ttyACM0', 115200)
 time.sleep(2)  # allow Pico to reboot
 
 def send_angle(angle):
+    msg = f"Set{angle}\n"
     ser.write(f"SET {angle}\n".encode())
+    ser.write(msg.encode())
 
 # Test loop
+
 while True:
     for angle in range(0, 181, 10):
         send_angle(angle)
