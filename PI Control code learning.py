@@ -5,7 +5,7 @@ ser = serial.Serial('/dev/ttyUSB0', 115200)
 time.sleep(2)  # allow Pico to reboot
 
 def send_angle(angle):
-    msg = f"Set{angle}\n"
+    msg = f"Set {angle}\n"
 def send_angle(angle):
     msg = f"SET {angle}\n"
     print(f"[PI] Sending: {msg.strip()}")
