@@ -1,5 +1,10 @@
 import serial
 import time
+import subprocess
+
+# Starts the mpremote run command for the file on ESP32
+subprocess.run(['mpremote', 'connect','auto', 'run', 'PI Control code learning.py'], check=True)
+time.sleep(0.5)
 
 ser = serial.Serial('/dev/ttyUSB0', 115200)
 time.sleep(2)  # allow Pico to reboot
