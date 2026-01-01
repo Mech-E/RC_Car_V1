@@ -1,15 +1,16 @@
 from machine import Pin, PWM
 import time, sys
 
-servo = PWM(Pin(15))
-servo.freq(50)
+# Use a SAFE ESP32 pin, e.g. GPIO18
+servo = PWM(Pin(18), freq=50)
 
 def set_angle(angle):
     min_us = 500
     max_us = 2500
     us = min_us + (angle / 180) * (max_us - min_us)
-    duty = int((us / 20000) * 65535)
-    servo.duty_u16(duty)
+
+    # ESP32 uses nanoseconds for precise servo control
+    servo.duty_ns(int(us * 1000))
 
 while True:
     line = sys.stdin.readline().strip()
