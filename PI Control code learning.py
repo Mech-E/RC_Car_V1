@@ -3,7 +3,7 @@ import time
 import subprocess
 
 # Starts the mpremote run command for the file on ESP32
-subprocess.run(['mpremote', 'connect','auto', 'run', 'MicroPython Servo Learning.py'], check=True)
+subprocess.run(['mpremote', 'connect','auto', 'run', 'MicroPython_Servo_Learning.py'], check=True)
 time.sleep(0.5)
 
 ser = serial.Serial('/dev/ttyUSB0', 115200)
