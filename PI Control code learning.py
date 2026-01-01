@@ -2,19 +2,18 @@ import serial
 import time
 import subprocess
 
-# Starts the mpremote run command for the file on ESP32
-subprocess.run(['mpremote', 'connect','auto', 'run', 'MicroPython_Servo_Learning.py'], check=True)
-time.sleep(0.5)
+# Start ESP32 script without blocking
+proc = subprocess.Popen(['mpremote', 'connect', 'auto', 'run', 'MicroPython_Servo_Learning.py'])
+
+time.sleep(1)  # give ESP32 time to boot and start listening
 
 ser = serial.Serial('/dev/ttyUSB0', 115200)
-time.sleep(2)  # allow Pico to reboot
+time.sleep(2)
 
 def send_angle(angle):
     msg = f"SET {angle}\n"
     print(f"[PI] Sending: {msg.strip()}")
     ser.write(msg.encode())
-
-# Test loop
 
 while True:
     for angle in range(0, 181, 10):
