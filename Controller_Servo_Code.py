@@ -1,4 +1,4 @@
-from evdev import Inputdevice, categorize, ecodes
+from evdev import InputDevice, categorize, ecodes
 
 # Find the controller path: ls /dev/input/
 
