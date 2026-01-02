@@ -7,9 +7,6 @@ import serial
 gamepad = InputDevice('/dev/input/event4') 
 print('Listening for controller events.....')
 
-# Start ESP32 script without blocking
-proc = subprocess.Popen(['mpremote', 'connect', 'auto', 'run', 'MicroPython_Servo_Learning.py'])
-
 time.sleep(1)  # give ESP32 time to boot and start listening
 
 ser = serial.Serial('/dev/ttyUSB0', 115200)
