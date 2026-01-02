@@ -26,7 +26,7 @@ for event in gamepad.read_loop():
         absevent = categorize(event)
         print(f"Axis: {absevent.event.code}, Value: {absevent.event.value}")
 
-    if absevent == 'ABS_Z':
+    if absevent.event.code == '2':
         angle = (absevent.event.value/1023)*180
         send_angle(angle)
 
