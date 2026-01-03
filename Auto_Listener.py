@@ -43,11 +43,11 @@ class ControllerListener:
 
             # Left Trigger
             if code == ecodes.ABS_Z:
-                self.callback("left_trigger", value)
+                self.callback("Left_trigger", value)
 
             # Right Trigger
             if code == ecodes.ABS_RZ:
-                self.callback("right_trigger", value)
+                self.callback("Right_trigger", value)
 
     def start(self):
         """Start the listener in a background thread."""
