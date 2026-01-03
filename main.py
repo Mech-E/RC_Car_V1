@@ -27,6 +27,7 @@ def handle_input(input_name, value):
     
     if input_name == "button_a" and value == 1:
         print("Button A Pressed")
+    
 
 listener = ControllerListener('/dev/input/event4', handle_input)
 listener.start()

@@ -18,7 +18,7 @@ class ControllerListener:
                     break
 
                 # Debug print
-                print("EVENT:", event)
+                # print("EVENT:", event)
 
                 # BUTTONS (EV_KEY)
                 if event.type == ecodes.EV_KEY:
