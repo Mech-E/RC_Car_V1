@@ -25,10 +25,10 @@ class ControllerListener:
                 value = event.value
 
                 if code == ecodes.BTN_SOUTH:
-                    self.callback("button_a", value)
+                    self.callback("Button A", value)
                 
                 if code == ecodes.BTN_EAST:
-                    self.callback("button_b", value)
+                    self.callback("Button B", value)
 
                 # Add more buttons here
                 continue
@@ -43,11 +43,11 @@ class ControllerListener:
 
             # Left Trigger
             if code == ecodes.ABS_Z:
-                self.callback("Left_trigger", value)
+                self.callback("Left Trigger", value)
 
             # Right Trigger
             if code == ecodes.ABS_RZ:
-                self.callback("Right_trigger", value)
+                self.callback("Right Trigger", value)
 
     def start(self):
         """Start the listener in a background thread."""
