@@ -15,18 +15,24 @@ def send_angle(angle):
     ser.write(msg.encode())
 
 def handle_input(input_name, value):
+    global current_trig_ang, locked_ang
     print("INPUT:", input_name, value)
 
     if input_name == "Left Trigger":
         angle = convert(value)
         send_angle(angle)
 
-    if input_name == "Right Trigger":
-        angle = convert(value)
-        send_angle(angle)
+    if input_name == "Button A" and value == 1:
+        locked_ang = current_trig_ang
+        print(f"[LCOK] Servo set to {locked_ang}")
+        send_angle(locked_ang)
+        return
     
-    if input_name == "button_a" and value == 1:
-        print("Button A Pressed")
+    if input_name == "Button B" and value == 1:
+        locked_ang = None
+        print("[RESET] Servo set to 0")
+        send_angle(0)
+        return
     
 
 listener = ControllerListener('/dev/input/event4', handle_input)
