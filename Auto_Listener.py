@@ -4,33 +4,35 @@ from evdev import InputDevice, categorize, ecodes
 class ControllerListener:
     def __init__(self, device_path, callback):
         self.gamepad = InputDevice(device_path)
-        self.callback = callback # Function to call when axis changes
+        self.callback = callback
         self.thread = None
         self.running = False
 
-        def start(self):
-            print("Listening for controller input...")
+    def _listen(self):
+        """Internal thread target: runs the event loop."""
+        print("Listening for controller input...")
 
-            for event in self.gamepad.read_loop():
-                if event.type != ecodes.EV_ABS:
-                    continue
+        for event in self.gamepad.read_loop():
+            if not self.running:
+                break
 
-                absevent = categorize
-                code = absevent.event.code
-                value = absevent.event.value
+            if event.type != ecodes.EV_ABS:
+                continue
 
-                # Only put axis we care about
+            absevent = categorize(event)
+            code = absevent.event.code
+            value = absevent.event.value
 
-                if code == ecodes.ABS_Z:
-                    self.callback(value)
-        
-        def start(self):
-            """Start the listner in a background thread"""
-            if self.thread is None:
-                self.running = True
-                self.thread = threading.Thread(target=self._listen, daemon=True)
-                self.thread.start()
+            if code == ecodes.ABS_Z:
+                self.callback(value)
 
-        def stop(self):
-            """Stop listener cleanly"""
-            self.running = False
+    def start(self):
+        """Start the listener in a background thread."""
+        if self.thread is None:
+            self.running = True
+            self.thread = threading.Thread(target=self._listen, daemon=True)
+            self.thread.start()
+
+    def stop(self):
+        """Stop the listener thread cleanly."""
+        self.running = False
