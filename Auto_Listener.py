@@ -15,6 +15,8 @@ class ControllerListener:
         for event in self.gamepad.read_loop():
             if not self.running:
                 break
+            
+            print("EVENT:", event)
 
             if event.type != ecodes.EV_ABS:
                 continue
