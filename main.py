@@ -8,6 +8,7 @@ time.sleep(2)
 def convert(raw):
     return int((raw / 1023) * 180)
 
+# Servo Angle Function
 def send_angle(angle):
     msg = f"SET {angle}\n"
     print(f"[PI] Sending: {msg.strip()}")

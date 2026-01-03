@@ -12,42 +12,69 @@ class ControllerListener:
         """Internal thread target: runs the event loop."""
         print("Listening for controller input...")
 
-        for event in self.gamepad.read_loop():
-            if not self.running:
-                break
-            
-            print("EVENT:", event)
+        try:
+            for event in self.gamepad.read_loop():
+                if not self.running:
+                    break
 
-            # Buttons EV_KEY
+                # Debug print
+                print("EVENT:", event)
 
-            if event.type == ecodes.EV_KEY:
-                code = event.code
-                value = event.value
+                # BUTTONS (EV_KEY)
+                if event.type == ecodes.EV_KEY:
+                    code = event.code
+                    value = event.value
 
-                if code == ecodes.BTN_SOUTH:
-                    self.callback("Button A", value)
-                
-                if code == ecodes.BTN_EAST:
-                    self.callback("Button B", value)
+                    if code == ecodes.BTN_SOUTH:
+                        self.callback("Button A", value)
+                    elif code == ecodes.BTN_EAST:
+                        self.callback("Button B", value)
+                    elif code == ecodes.BTN_NORTH:
+                        self.callback("Button X", value)
+                    elif code == ecodes.BTN_WEST:
+                        self.callback("Button Y", value)
+                    elif code == ecodes.BTN_DPAD_UP:
+                        self.callback("DPad Up", value)
+                    elif code == ecodes.BTN_DPAD_DOWN:
+                        self.callback("DPad Down", value)
+                    elif code == ecodes.BTN_DPAD_LEFT:
+                        self.callback("DPad Left", value)
+                    elif code == ecodes.BTN_DPAD_RIGHT:
+                        self.callback("DPad Right", value)
+                    elif code == ecodes.BTN_TR:
+                        self.callback("Right Bumper", value)
+                    elif code == ecodes.BTN_TL:
+                        self.callback("Left Bumper", value)
+                    elif code == ecodes.BTN_START:
+                        self.callback("Start", value)
+                    elif code == ecodes.BTN_SELECT:
+                        self.callback("Select", value)
 
-                # Add more buttons here
-                continue
-            
-            # Analog sticks
+                    # Done with EV_KEY
+                    continue
 
-            if event.type != ecodes.EV_ABS:
-                continue
-            absevent = categorize(event)
-            code = absevent.event.code
-            value = absevent.event.value
+                # ANALOG (EV_ABS)
+                if event.type == ecodes.EV_ABS:
+                    absevent = categorize(event)
+                    code = absevent.event.code
+                    value = absevent.event.value
 
-            # Left Trigger
-            if code == ecodes.ABS_Z:
-                self.callback("Left Trigger", value)
+                    if code == ecodes.ABS_Z:
+                        self.callback("Left Trigger", value)
+                    elif code == ecodes.ABS_RZ:
+                        self.callback("Right Trigger", value)
+                    elif code == ecodes.ABS_X:
+                        self.callback("Left Stick Horizontal", value)
+                    elif code == ecodes.ABS_Y:
+                        self.callback("Left Stick Vertical", value)
+                    elif code == ecodes.ABS_RX:
+                        self.callback("Right Stick Horizontal", value)
+                    elif code == ecodes.ABS_RY:
+                        self.callback("Right Stick Vertical", value)
 
-            # Right Trigger
-            if code == ecodes.ABS_RZ:
-                self.callback("Right Trigger", value)
+        except OSError:
+            print("Controller disconnected")
+            self.running = False
 
     def start(self):
         """Start the listener in a background thread."""
