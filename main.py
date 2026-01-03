@@ -13,11 +13,21 @@ def send_angle(angle):
     print(f"[PI] Sending: {msg.strip()}")
     ser.write(msg.encode())
 
-def handle_trigger(raw_value):
-    angle = convert(raw_value)
-    send_angle(angle)
+def handle_input(input_name, value):
+    print("INPUT:", input_name, value)
 
-listener = ControllerListener('/dev/input/event4', handle_trigger)
+    if input_name == "Left Trigger":
+        angle = convert(value)
+        send_angle(angle)
+
+    if input_name == "Right Trigger":
+        angle = convert(value)
+        send_angle(angle)
+    
+    if input_name == "button_a" and value == 1:
+        print("Button A Pressed")
+
+listener = ControllerListener('/dev/input/event4', handle_input)
 listener.start()
 
 while True:
