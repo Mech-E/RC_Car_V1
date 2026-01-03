@@ -14,6 +14,9 @@ def send_angle(angle):
     print(f"[PI] Sending: {msg.strip()}")
     ser.write(msg.encode())
 
+current_trig_ang = 0
+locked_ang = None
+
 def handle_input(input_name, value):
     global current_trig_ang, locked_ang
     print("INPUT:", input_name, value)
