@@ -23,6 +23,7 @@ def handle_input(input_name, value):
 
     if input_name == "Left Trigger":
         current_trig_ang = convert(value)
+        send_angle(current_trig_ang)
         print(f"Trigger angle = {current_trig_ang}")
         return
 
