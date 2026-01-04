@@ -22,8 +22,9 @@ def handle_input(input_name, value):
     print("INPUT:", input_name, value)
 
     if input_name == "Left Trigger":
-        angle = convert(value)
-        send_angle(angle)
+        current_trig_ang = convert(value)
+        print(f"Trigger angle = {current_trig_ang}")
+        return
 
     if input_name == "Button A" and value == 1:
         locked_ang = current_trig_ang
