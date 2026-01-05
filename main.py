@@ -23,6 +23,7 @@ def handle_input(input_name, value):
     # TRIGGER MOVEMENT — update angle but DO NOT send
     if input_name == "Left Trigger":
         current_trig_ang = convert(value)
+        send_angle(locked_ang if locked_ang is not None else current_trig_ang)
         print(f"Trigger angle = {current_trig_ang}")
         return
 
