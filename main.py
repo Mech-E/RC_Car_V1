@@ -26,20 +26,18 @@ def handle_input(input_name, value):
         print(f"Trigger angle = {current_trig_ang}")
         return
 
-    # BUTTON A — lock angle
+    # Lock Trigger Angle
     if input_name == "Button A" and value == 1:
         locked_ang = current_trig_ang
-        print(f"[LOCK] Servo set to {locked_ang}")
+        print(f"Locked angle = {locked_ang}")
         send_angle(locked_ang)
         return
-
-    # BUTTON B — reset
+    
     if input_name == "Button B" and value == 1:
+        print("Unlocking angle control.")
         locked_ang = None
-        print("[RESET] Servo set to 0")
-        send_angle(0)
         return
-
+    
 listener = ControllerListener('/dev/input/event4', handle_input)
 listener.start()
 
