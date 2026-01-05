@@ -20,14 +20,16 @@ def handle_input(input_name, value):
     global current_trig_ang, locked_ang
     print("INPUT:", input_name, value)
 
-    # TRIGGER MOVEMENT — update angle but DO NOT send
     if input_name == "Left Trigger":
         current_trig_ang = convert(value)
-        send_angle(locked_ang if locked_ang is not None else current_trig_ang)
+
+        # Always send a valid angle
+        angle_to_send = locked_ang if locked_ang is not None else current_trig_ang
+        send_angle(angle_to_send)
+
         print(f"Trigger angle = {current_trig_ang}")
         return
 
-    # Lock Trigger Angle
     if input_name == "Button A" and value == 1:
         locked_ang = current_trig_ang
         print(f"Locked angle = {locked_ang}")
@@ -37,8 +39,10 @@ def handle_input(input_name, value):
     if input_name == "Button B" and value == 1:
         print("Unlocking angle control.")
         locked_ang = None
+        send_angle(0)   # IMPORTANT
         return
     
+
 listener = ControllerListener('/dev/input/event4', handle_input)
 listener.start()
 
