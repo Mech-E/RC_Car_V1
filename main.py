@@ -43,7 +43,7 @@ def handle_input(input_name, value):
         return
     
 
-listener = ControllerListener('/dev/input/4', handle_input)
+listener = ControllerListener('/dev/input/5', handle_input)
 listener.start()
 
 while True:
