@@ -1,6 +1,6 @@
 import time
 import serial
-from Auto_Listener import ControllerListener
+from ControllerListener import ControllerListener
 
 ser = serial.Serial('/dev/ttyUSB0', 115200)
 time.sleep(2)
