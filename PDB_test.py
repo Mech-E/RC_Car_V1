@@ -3,6 +3,7 @@
 # -----------------------------
 from machine import I2C, Pin
 import time
+import sys
 
 class PCA9685:
     def __init__(self, i2c, address=0x40):
@@ -31,7 +32,7 @@ class PCA9685:
         self.i2c.writeto_mem(self.address, 0x06 + 4 * channel, data)
 
 # -----------------------------
-# SERVO CONTROL
+# SERVO CONTROL + STOP COMMAND
 # -----------------------------
 
 i2c = I2C(0, sda=Pin(0), scl=Pin(1))
@@ -40,20 +41,43 @@ pca.set_pwm_freq(50)
 
 SERVO_CH = 1
 
-# Typical servo pulse range for PCA9685
-MIN_PULSE = 150   # 0 degrees
-MAX_PULSE = 600   # 180 degrees
+MIN_PULSE = 150
+MAX_PULSE = 600
 
 def set_angle(angle):
     pulse = int(MIN_PULSE + (MAX_PULSE - MIN_PULSE) * (angle / 180))
     pca.set_pwm(SERVO_CH, 0, pulse)
 
-# Sweep 0 → 180 → 0 forever
+print("Type 'stop' and press Enter to terminate.")
+
+# -----------------------------
+# MAIN LOOP WITH SERIAL STOP
+# -----------------------------
 while True:
+
+    # Check for serial input
+    if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+        cmd = sys.stdin.readline().strip().lower()
+        if cmd == "stop":
+            print("Stopping.")
+            break
+
+    # Sweep up
     for angle in range(0, 181, 5):
+        if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+            cmd = sys.stdin.readline().strip().lower()
+            if cmd == "stop":
+                print("Stopping.")
+                raise SystemExit
         set_angle(angle)
         time.sleep(0.02)
 
+    # Sweep down
     for angle in range(180, -1, 5):
+        if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+            cmd = sys.stdin.readline().strip().lower()
+            if cmd == "stop":
+                print("Stopping.")
+                raise SystemExit
         set_angle(angle)
         time.sleep(0.02)
