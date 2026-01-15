@@ -4,6 +4,7 @@
 from machine import I2C, Pin
 import time
 import sys
+import select
 
 class PCA9685:
     def __init__(self, i2c, address=0x40):
