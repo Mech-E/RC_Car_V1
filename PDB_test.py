@@ -1,7 +1,7 @@
 # -----------------------------
 # PCA9685 DRIVER (embedded)
 # -----------------------------
-from machine import I2C
+from machine import I2C, Pin
 import time
 
 class PCA9685:
@@ -31,13 +31,29 @@ class PCA9685:
         self.i2c.writeto_mem(self.address, 0x06 + 4 * channel, data)
 
 # -----------------------------
-# YOUR NORMAL CODE
+# SERVO CONTROL
 # -----------------------------
-from machine import Pin, I2C
 
 i2c = I2C(0, sda=Pin(0), scl=Pin(1))
 pca = PCA9685(i2c)
 pca.set_pwm_freq(50)
 
-# Move servo on channel 1
-pca.set_pwm(1, 0, 375)
+SERVO_CH = 1
+
+# Typical servo pulse range for PCA9685
+MIN_PULSE = 150   # 0 degrees
+MAX_PULSE = 600   # 180 degrees
+
+def set_angle(angle):
+    pulse = int(MIN_PULSE + (MAX_PULSE - MIN_PULSE) * (angle / 180))
+    pca.set_pwm(SERVO_CH, 0, pulse)
+
+# Sweep 0 → 180 → 0 forever
+while True:
+    for angle in range(0, 181, 5):
+        set_angle(angle)
+        time.sleep(0.02)
+
+    for angle in range(180, -1, 5):
+        set_angle(angle)
+        time.sleep(0.02)
