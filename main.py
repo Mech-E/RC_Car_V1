@@ -12,6 +12,9 @@ Send_interval = 0.02  # 20 ms
 def convert(raw):
     return int((raw / 1023) * 180)
 
+def convert_steering(joystick_raw):
+    return int(((joystick_raw + 32768) / 65535) * 180)
+
 def send_angle(angle):
     global last_send
     now = time.monotonic()
@@ -44,6 +47,11 @@ def handle_input(input_name, value):
         send_angle(0)   # IMPORTANT
         return
     
+    if input_name == "Right Joystick Horizontal":
+        steering_angle = convert_steering(value)
+        send_angle(steering_angle)
+        print(f"Steering Angle: {steering_angle}")
+        return
 
 listener = ControllerListener('/dev/input/event4', handle_input)
 listener.start()

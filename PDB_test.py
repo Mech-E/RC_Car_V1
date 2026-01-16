@@ -41,6 +41,8 @@ pca = PCA9685(i2c)
 pca.set_pwm_freq(50)
 
 SERVO_SUSPENSION = [1,2,3,4]
+Steering_Channel = 0
+
 MIN_PULSE = 150
 MAX_PULSE = 600
 
@@ -52,7 +54,6 @@ update_interval = 20   # 50 Hz
 def set_angle(angle):
     global last_update
     now = time.ticks_ms()
-
     if time.ticks_diff(now, last_update) >= update_interval:
         last_update = now
 
@@ -68,7 +69,6 @@ def set_angle(angle):
 # -----------------------------
 def read_serial():
     global latest_angle
-
     # Drain the serial buffer completely
     while sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
         line = sys.stdin.readline().strip().lower()
