@@ -3,7 +3,9 @@ import time
 import sys
 import select
 
-# Class to interface with PCA9685 PWM driver
+# -----------------------------
+# PCA9685 DRIVER
+# -----------------------------
 class PCA9685:
     def __init__(self, i2c, address=0x40):
         self.i2c = i2c
@@ -30,47 +32,59 @@ class PCA9685:
         data = bytearray([on & 0xFF, on >> 8, off & 0xFF, off >> 8])
         self.i2c.writeto_mem(self.address, 0x06 + 4 * channel, data)
 
-# -----------------------------
-# SERVO CONTROL + STOP COMMAND
-# -----------------------------
 
+# -----------------------------
+# SERVO + RATE LIMITING
+# -----------------------------
 i2c = I2C(0, sda=Pin(0), scl=Pin(1))
 pca = PCA9685(i2c)
 pca.set_pwm_freq(50)
-last_update = time.ticks_ms()
-update_interval = 20 # 50 Hz
-latest_angle = None
-SERVO_SUSPENSION = [1,2,3,4]
-SERVO_STEERING = [5]
 
+SERVO_SUSPENSION = [1,2,3,4]
 MIN_PULSE = 150
 MAX_PULSE = 600
+
+latest_angle = None
+last_update = time.ticks_ms()
+update_interval = 20   # 50 Hz
+
 
 def set_angle(angle):
     global last_update
     now = time.ticks_ms()
+
     if time.ticks_diff(now, last_update) >= update_interval:
         last_update = now
+
         angle = max(0, min(180, angle))
         pulse = int(MIN_PULSE + (MAX_PULSE - MIN_PULSE) * (angle / 180))
+
         for ch in SERVO_SUSPENSION:
             pca.set_pwm(ch, 0, pulse)
 
+
+# -----------------------------
+# NON-BLOCKING SERIAL READER
+# -----------------------------
 def read_serial():
-    global last_update
+    global latest_angle
+
+    # Drain the serial buffer completely
     while sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
         line = sys.stdin.readline().strip().lower()
+
         if line.startswith("set"):
             try:
                 latest_angle = int(line.split()[1])
-                set_angle(angle)
             except:
                 pass
+
+
 # -----------------------------
-# MAIN LOOP WITH SERIAL STOP
+# MAIN LOOP (REAL-TIME)
 # -----------------------------
 while True:
     read_serial()
-    
+
     if latest_angle is not None:
         set_angle(latest_angle)
