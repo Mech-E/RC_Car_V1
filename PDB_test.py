@@ -37,6 +37,8 @@ class PCA9685:
 i2c = I2C(0, sda=Pin(0), scl=Pin(1))
 pca = PCA9685(i2c)
 pca.set_pwm_freq(50)
+last_update = time.ticks_ms()
+update_interval = 20 # 50 Hz
 
 SERVO_SUSPENSION = [1,2,3,4]
 SERVO_STEERING = [5]
@@ -45,11 +47,14 @@ MIN_PULSE = 150
 MAX_PULSE = 600
 
 def set_angle(angle):
-    angle = max(0, min(180, angle))
-    pulse = int(MIN_PULSE + (MAX_PULSE - MIN_PULSE) * (angle / 180))
-    for ch in SERVO_SUSPENSION:
-        pca.set_pwm(ch, 0, pulse)
-
+    global last_update
+    now = time.ticks_ms()
+    if time.ticks_diff(now, last_update) >= update_interval:
+        last_update = now
+        angle = max(0, min(180, angle))
+        pulse = int(MIN_PULSE + (MAX_PULSE - MIN_PULSE) * (angle / 180))
+        for ch in SERVO_SUSPENSION:
+            pca.set_pwm(ch, 0, pulse)
 print("Pico ready)")
 print("CTRL + C to exit the PICO 2 Code")
 
