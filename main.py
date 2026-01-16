@@ -5,20 +5,26 @@ from ControllerListener import ControllerListener
 ser = serial.Serial('/dev/ttyACM0', 115200)
 time.sleep(2)
 
+# Signal Rate limiter
+last_send = 0
+Send_interval = 0.02  # 20 ms 
+
 def convert(raw):
     return int((raw / 1023) * 180)
 
 def send_angle(angle):
-    msg = f"SET {angle}\n"
-    print(f"[PI] Sending: {msg.strip()}")
-    ser.write(msg.encode())
+    global last_send
+    now = time.monotonic()
+    if now - last_send >= Send_interval:
+        msg = f"SET {angle}\n"
+        ser.write(msg.encode())
+        last_send = now
 
 current_trig_ang = 0
 locked_ang = None
 
 def handle_input(input_name, value):
     global current_trig_ang, locked_ang
-    print("INPUT:", input_name, value)
 
     if input_name == "Left Trigger":
         current_trig_ang = convert(value)
@@ -26,18 +32,14 @@ def handle_input(input_name, value):
         # Always send a valid angle
         angle_to_send = locked_ang if locked_ang is not None else current_trig_ang
         send_angle(angle_to_send)
-
-        print(f"Trigger angle = {current_trig_ang}")
         return
 
     if input_name == "Button A" and value == 1:
         locked_ang = current_trig_ang
-        print(f"Locked angle = {locked_ang}")
         send_angle(locked_ang)
         return
     
     if input_name == "Button B" and value == 1:
-        print("Unlocking angle control.")
         locked_ang = None
         send_angle(0)   # IMPORTANT
         return
