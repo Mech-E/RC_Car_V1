@@ -2,7 +2,7 @@ import time
 import serial
 from ControllerListener import ControllerListener
 
-ser = serial.Serial('/dev/ttyUSB0', 115200)
+ser = serial.Serial('/dev/ttyACM0', 115200)
 time.sleep(2)
 
 def convert(raw):
