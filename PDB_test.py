@@ -1,11 +1,9 @@
-# -----------------------------
-# PCA9685 DRIVER (embedded)
-# -----------------------------
 from machine import I2C, Pin
 import time
 import sys
 import select
 
+# Class to interface with PCA9685 PWM driver
 class PCA9685:
     def __init__(self, i2c, address=0x40):
         self.i2c = i2c
