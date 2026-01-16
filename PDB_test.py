@@ -39,7 +39,7 @@ pca = PCA9685(i2c)
 pca.set_pwm_freq(50)
 last_update = time.ticks_ms()
 update_interval = 20 # 50 Hz
-
+latest_angle = None
 SERVO_SUSPENSION = [1,2,3,4]
 SERVO_STEERING = [5]
 
@@ -55,21 +55,22 @@ def set_angle(angle):
         pulse = int(MIN_PULSE + (MAX_PULSE - MIN_PULSE) * (angle / 180))
         for ch in SERVO_SUSPENSION:
             pca.set_pwm(ch, 0, pulse)
-print("Pico ready)")
-print("CTRL + C to exit the PICO 2 Code")
 
+def read_serial():
+    global last_update
+    while sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+        line = sys.stdin.readline().strip().lower()
+        if line.startswith("set"):
+            try:
+                latest_angle = int(line.split()[1])
+                set_angle(angle)
+            except:
+                pass
 # -----------------------------
 # MAIN LOOP WITH SERIAL STOP
 # -----------------------------
 while True:
-
-    # Check for serial input
-    if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-        line = sys.stdin.readline().strip().lower()
-        if line.startswith("set"):
-            print("Received:", line)   # <--- ADD THIS
-        try:
-            angle = int(line.split()[1])
-            set_angle(angle)
-        except:
-            pass
+    read_serial()
+    
+    if latest_angle is not None:
+        set_angle(latest_angle)
