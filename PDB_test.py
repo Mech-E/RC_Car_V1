@@ -65,7 +65,7 @@ while True:
             print("Stopping.")
             break
 
-        if line.startswith("set"):
+        if line.startswith("SET"):
             try:
                 angle = int(line.split()[1])
                 set_angle(angle)
