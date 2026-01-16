@@ -67,14 +67,4 @@ while True:
             angle = int(line.split()[1])
             set_angle(angle)
         except:
-            print("Parse error:", line)
-        if line == "stop":
-            print("Stopping.")
-            break
-
-        if line.startswith("set"):
-            try:
-                angle = int(line.split()[1])
-                set_angle(angle)
-            except:
-                pass
+            pass
