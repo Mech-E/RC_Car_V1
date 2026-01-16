@@ -61,6 +61,13 @@ while True:
     # Check for serial input
     if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
         line = sys.stdin.readline().strip().lower()
+        if line.startswith("set"):
+            print("Received:", line)   # <--- ADD THIS
+        try:
+            angle = int(line.split()[1])
+            set_angle(angle)
+        except:
+            print("Parse error:", line)
         if line == "stop":
             print("Stopping.")
             break
