@@ -38,16 +38,20 @@ i2c = I2C(0, sda=Pin(0), scl=Pin(1))
 pca = PCA9685(i2c)
 pca.set_pwm_freq(50)
 
-SERVO_CH = 1
+SERVO_SUSPENSION = [1,2,3,4]
+SERVO_STEERING = [5]
 
 MIN_PULSE = 150
 MAX_PULSE = 600
 
 def set_angle(angle):
+    angle = max(0, min(180, angle))
     pulse = int(MIN_PULSE + (MAX_PULSE - MIN_PULSE) * (angle / 180))
-    pca.set_pwm(SERVO_CH, 0, pulse)
+    for ch in SERVO_SUSPENSION:
+        pca.set_pwm(ch, 0, pulse)
 
-print("Type 'stop' and press Enter to terminate.")
+print("Pico ready)")
+print("CTRL + C to exit the PICO 2 Code")
 
 # -----------------------------
 # MAIN LOOP WITH SERIAL STOP
@@ -56,27 +60,14 @@ while True:
 
     # Check for serial input
     if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-        cmd = sys.stdin.readline().strip().lower()
-        if cmd == "stop":
+        line = sys.stdin.readline().strip().lower()
+        if line == "stop":
             print("Stopping.")
             break
 
-    # Sweep up
-    for angle in range(0, 181, 5):
-        if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-            cmd = sys.stdin.readline().strip().lower()
-            if cmd == "stop":
-                print("Stopping.")
-                raise SystemExit
-        set_angle(angle)
-        time.sleep(0.02)
-
-    # Sweep down
-    for angle in range(180, -1, 5):
-        if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-            cmd = sys.stdin.readline().strip().lower()
-            if cmd == "stop":
-                print("Stopping.")
-                raise SystemExit
-        set_angle(angle)
-        time.sleep(0.02)
+        if line.startswith("set"):
+            try:
+                angle = int(line.split()[1])
+                set_angle(angle)
+            except:
+                pass
