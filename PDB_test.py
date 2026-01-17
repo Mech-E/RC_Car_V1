@@ -34,50 +34,57 @@ class PCA9685:
 
 
 # -----------------------------
-# SERVO + RATE LIMITING
+# SERVO CONFIG
 # -----------------------------
 i2c = I2C(0, sda=Pin(0), scl=Pin(1))
 pca = PCA9685(i2c)
 pca.set_pwm_freq(50)
 
-SERVO_SUSPENSION = [1,2,3,4]
-Steering_Channel = 0
+SERVO_SUSPENSION = [1, 2, 3, 4]
+STEERING_CHANNEL = 0
 
 MIN_PULSE = 150
 MAX_PULSE = 600
 
-latest_angle = None
-last_update = time.ticks_ms()
-update_interval = 20   # 50 Hz
+
+def angle_to_pulse(angle):
+    angle = max(0, min(180, angle))
+    return int(MIN_PULSE + (MAX_PULSE - MIN_PULSE) * (angle / 180))
 
 
-def set_angle(angle):
-    global last_update
-    now = time.ticks_ms()
-    if time.ticks_diff(now, last_update) >= update_interval:
-        last_update = now
+def set_steering(angle):
+    pulse = angle_to_pulse(angle)
+    pca.set_pwm(STEERING_CHANNEL, 0, pulse)
 
-        angle = max(0, min(180, angle))
-        pulse = int(MIN_PULSE + (MAX_PULSE - MIN_PULSE) * (angle / 180))
 
-        for ch in SERVO_SUSPENSION:
-            pca.set_pwm(ch, 0, pulse)
+def set_suspension(angle):
+    pulse = angle_to_pulse(angle)
+    for ch in SERVO_SUSPENSION:
+        pca.set_pwm(ch, 0, pulse)
 
 
 # -----------------------------
 # NON-BLOCKING SERIAL READER
 # -----------------------------
 def read_serial():
-    global latest_angle
-    # Drain the serial buffer completely
     while sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
         line = sys.stdin.readline().strip().lower()
+        parts = line.split()
 
-        if line.startswith("set"):
-            try:
-                latest_angle = int(line.split()[1])
-            except:
-                pass
+        if len(parts) < 2:
+            continue
+
+        cmd = parts[0]
+        try:
+            value = int(parts[1])
+        except:
+            continue
+
+        if cmd == "set":
+            set_suspension(value)
+
+        elif cmd == "steer":
+            set_steering(value)
 
 
 # -----------------------------
@@ -85,6 +92,4 @@ def read_serial():
 # -----------------------------
 while True:
     read_serial()
-
-    if latest_angle is not None:
-        set_angle(latest_angle)
+    time.sleep_ms(5)

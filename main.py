@@ -6,7 +6,8 @@ ser = serial.Serial('/dev/ttyACM0', 115200)
 time.sleep(2)
 
 # Signal Rate limiter
-last_send = 0
+last_send_Susp = 0
+last_send_Steer = 0
 Send_interval = 0.02  # 20 ms 
 
 def convert(raw):
@@ -15,13 +16,21 @@ def convert(raw):
 def convert_steering(joystick_raw):
     return int(((joystick_raw + 32768) / 65535) * 180)
 
-def send_angle(angle):
-    global last_send
+def Send_Steering(angle):
+    global last_send_Steer
     now = time.monotonic()
-    if now - last_send >= Send_interval:
+    if now - last_send_Steer >= Send_interval:
+        msg = f"STEER {angle}\n"
+        ser.write(msg.encode())
+        last_send_Steer = now
+
+def Send_Suspension(angle):
+    global last_send_Susp
+    now = time.monotonic()
+    if now - last_send_Susp >= Send_interval:
         msg = f"SET {angle}\n"
         ser.write(msg.encode())
-        last_send = now
+        last_send_Susp = now
 
 current_trig_ang = 0
 locked_ang = None
@@ -34,22 +43,22 @@ def handle_input(input_name, value):
 
         # Always send a valid angle
         angle_to_send = locked_ang if locked_ang is not None else current_trig_ang
-        send_angle(angle_to_send)
+        Send_Suspension(angle_to_send)
         return
 
     if input_name == "Button A" and value == 1:
         locked_ang = current_trig_ang
-        send_angle(locked_ang)
+        Send_Suspension(locked_ang)
         return
     
     if input_name == "Button B" and value == 1:
         locked_ang = None
-        send_angle(0)   # IMPORTANT
+        Send_Suspension(0)   # IMPORTANT
         return
     
     if input_name == "Right Joystick Horizontal":
         steering_angle = convert_steering(value)
-        send_angle(steering_angle)
+        Send_Steering(steering_angle)
         print(f"Steering Angle: {steering_angle}")
         return
 
