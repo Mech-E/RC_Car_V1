@@ -56,5 +56,11 @@ def handle_input(input_name, value):
 listener = ControllerListener('/dev/input/event4', handle_input)
 listener.start()
 
-while True:
-    time.sleep(1)
+# Clean kill of the program
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    print("\nClosing serial connection...")
+    ser.close() 
+    print("Done.")
