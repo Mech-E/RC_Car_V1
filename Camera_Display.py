@@ -1,6 +1,6 @@
 import sys
 from picamera2 import Picamera2
-from picamera2.previews import OpenGLPreview
+from picamera2.previews import FullscreenPreview
 
 
 class CameraDisplayGL:
